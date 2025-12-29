@@ -14,16 +14,321 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analytics_snapshots: {
+        Row: {
+          account_id: string
+          created_at: string
+          engagement_rate: number | null
+          followers_count: number | null
+          id: string
+          posts_count: number | null
+          snapshot_date: string
+          total_comments: number | null
+          total_likes: number | null
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          id?: string
+          posts_count?: number | null
+          snapshot_date?: string
+          total_comments?: number | null
+          total_likes?: number | null
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          id?: string
+          posts_count?: number | null
+          snapshot_date?: string
+          total_comments?: number | null
+          total_likes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_snapshots_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      best_posting_times: {
+        Row: {
+          account_id: string
+          day_of_week: number
+          engagement_score: number | null
+          hour_of_day: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          day_of_week: number
+          engagement_score?: number | null
+          hour_of_day: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          day_of_week?: number
+          engagement_score?: number | null
+          hour_of_day?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "best_posting_times_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instagram_accounts: {
+        Row: {
+          access_token: string | null
+          avatar_url: string | null
+          avg_likes_per_post: number | null
+          created_at: string
+          engagement_rate: number | null
+          followers_count: number | null
+          id: string
+          instagram_id: string | null
+          is_active: boolean | null
+          last_synced_at: string | null
+          posts_count: number | null
+          token_expires_at: string | null
+          total_likes: number | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          access_token?: string | null
+          avatar_url?: string | null
+          avg_likes_per_post?: number | null
+          created_at?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          id?: string
+          instagram_id?: string | null
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          posts_count?: number | null
+          token_expires_at?: string | null
+          total_likes?: number | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          access_token?: string | null
+          avatar_url?: string | null
+          avg_likes_per_post?: number | null
+          created_at?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          id?: string
+          instagram_id?: string | null
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          posts_count?: number | null
+          token_expires_at?: string | null
+          total_likes?: number | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          account_id: string
+          caption: string | null
+          comments_count: number | null
+          created_at: string
+          hashtags: string[] | null
+          id: string
+          instagram_post_id: string | null
+          likes_count: number | null
+          media_type: string
+          media_urls: string[] | null
+          posted_at: string | null
+        }
+        Insert: {
+          account_id: string
+          caption?: string | null
+          comments_count?: number | null
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          instagram_post_id?: string | null
+          likes_count?: number | null
+          media_type?: string
+          media_urls?: string[] | null
+          posted_at?: string | null
+        }
+        Update: {
+          account_id?: string
+          caption?: string | null
+          comments_count?: number | null
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          instagram_post_id?: string | null
+          likes_count?: number | null
+          media_type?: string
+          media_urls?: string[] | null
+          posted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      scheduled_posts: {
+        Row: {
+          account_id: string
+          caption: string | null
+          created_at: string
+          error_message: string | null
+          first_comment: string | null
+          hashtags: string[] | null
+          id: string
+          media_type: string
+          media_urls: string[] | null
+          published_post_id: string | null
+          scheduled_for: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          caption?: string | null
+          created_at?: string
+          error_message?: string | null
+          first_comment?: string | null
+          hashtags?: string[] | null
+          id?: string
+          media_type?: string
+          media_urls?: string[] | null
+          published_post_id?: string | null
+          scheduled_for: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          caption?: string | null
+          created_at?: string
+          error_message?: string | null
+          first_comment?: string | null
+          hashtags?: string[] | null
+          id?: string
+          media_type?: string
+          media_urls?: string[] | null
+          published_post_id?: string | null
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_posts_published_post_id_fkey"
+            columns: ["published_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +455,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
