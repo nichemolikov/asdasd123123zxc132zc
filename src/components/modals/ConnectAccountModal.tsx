@@ -1,27 +1,45 @@
 import { useState } from "react";
 import { Instagram, X, Shield, Zap, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface ConnectAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConnect: (username: string) => Promise<any>;
 }
 
-export const ConnectAccountModal = ({ isOpen, onClose }: ConnectAccountModalProps) => {
+export const ConnectAccountModal = ({ isOpen, onClose, onConnect }: ConnectAccountModalProps) => {
   const [step, setStep] = useState<"choose" | "connecting" | "success">("choose");
+  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
+    if (!username.trim()) return;
+    
     setStep("connecting");
-    setTimeout(() => {
-      setStep("success");
-    }, 2000);
+    setLoading(true);
+    
+    try {
+      const result = await onConnect(username.replace("@", ""));
+      if (result) {
+        setStep("success");
+      } else {
+        setStep("choose");
+      }
+    } catch (error) {
+      setStep("choose");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
     setStep("choose");
+    setUsername("");
     onClose();
   };
 
@@ -59,6 +77,19 @@ export const ConnectAccountModal = ({ isOpen, onClose }: ConnectAccountModalProp
               </div>
             </div>
 
+            {/* Username Input */}
+            <div className="px-6 pb-4">
+              <Label htmlFor="username">Instagram Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="@yourusername"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mt-2 bg-background/50"
+              />
+            </div>
+
             {/* Features */}
             <div className="px-6 pb-6 space-y-3">
               <div className="flex items-start gap-3 p-3 rounded-xl bg-secondary/50">
@@ -88,8 +119,9 @@ export const ConnectAccountModal = ({ isOpen, onClose }: ConnectAccountModalProp
                 size="xl" 
                 className="w-full"
                 onClick={handleConnect}
+                disabled={!username.trim() || loading}
               >
-                Continue with Instagram
+                Connect Account
               </Button>
               <p className="text-xs text-center text-muted-foreground mt-4">
                 By connecting, you agree to our Terms of Service and Privacy Policy
@@ -126,7 +158,7 @@ export const ConnectAccountModal = ({ isOpen, onClose }: ConnectAccountModalProp
             </div>
             <h2 className="text-xl font-bold text-card-foreground mb-2">Account Connected!</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Your Instagram account has been successfully linked
+              @{username} has been successfully linked
             </p>
             <Button onClick={handleClose} className="w-full">
               Go to Dashboard
