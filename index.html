@@ -20,6 +20,26 @@
 
   <body>
     <div id="root"></div>
+    
+    <!-- Facebook SDK Loader -->
+    <script>
+      window.fbAsyncInit = function() {
+        // SDK is loaded, initialization will happen from React app
+        // This callback is triggered when the SDK is ready
+        if (window.FB) {
+          window.dispatchEvent(new Event('fb-sdk-ready'));
+        }
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
