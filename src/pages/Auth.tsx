@@ -25,13 +25,13 @@ const Auth = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate("/");
+        navigate("/dashboard");
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate("/");
+        navigate("/dashboard");
       }
     });
 
@@ -119,10 +119,29 @@ const Auth = () => {
             });
           }
         } else {
-          toast({
-            title: "Account Created!",
-            description: "Welcome to InstaFlow! You can now start managing your Instagram accounts.",
-          });
+          // Call signup_bootstrap to create workspace and subscription
+          try {
+            const { data: bootstrapData, error: bootstrapError } = await supabase.rpc(
+              "signup_bootstrap",
+              { workspace_name: fullName ? `${fullName}'s Workspace` : "My Workspace" }
+            );
+
+            if (bootstrapError) {
+              console.error("Bootstrap error:", bootstrapError);
+              // Don't fail signup if bootstrap fails - user can still login
+            }
+
+            toast({
+              title: "Account Created!",
+              description: "Welcome to InstaCommand! Your workspace has been set up.",
+            });
+          } catch (bootstrapErr: any) {
+            console.error("Bootstrap error:", bootstrapErr);
+            toast({
+              title: "Account Created!",
+              description: "Welcome to InstaCommand! You can now start managing your Instagram accounts.",
+            });
+          }
         }
       }
     } catch (error) {
@@ -145,7 +164,7 @@ const Auth = () => {
             <Instagram className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-pink-500 bg-clip-text text-transparent">
-            InstaFlow
+            InstaCommand
           </h1>
           <p className="text-muted-foreground mt-2">
             {isLogin ? "Welcome back!" : "Create your account"}

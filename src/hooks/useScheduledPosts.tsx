@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useWorkspace } from "./useWorkspace";
 import { useToast } from "./use-toast";
 
 export interface ScheduledPost {
   id: string;
-  account_id: string;
+  workspace_id: string;
+  instagram_account_id: string;
   caption: string | null;
   media_type: string;
-  media_urls: string[];
-  hashtags: string[];
-  scheduled_for: string;
+  media_urls: string[] | any; // JSONB array
+  hashtags: string | null;
+  scheduled_at: string;
   status: string;
+  published_at: string | null;
   created_at: string;
   instagram_accounts?: {
     username: string;
-    avatar_url: string | null;
+    profile_picture_url: string | null;
   };
 }
 
@@ -23,10 +26,11 @@ export const useScheduledPosts = () => {
   const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { workspace } = useWorkspace();
   const { toast } = useToast();
 
   const fetchScheduledPosts = async () => {
-    if (!user) {
+    if (!user || !workspace) {
       setScheduledPosts([]);
       setLoading(false);
       return;
@@ -39,15 +43,35 @@ export const useScheduledPosts = () => {
           *,
           instagram_accounts (
             username,
-            avatar_url
+            profile_picture_url
           )
         `)
-        .eq("status", "pending")
-        .order("scheduled_for", { ascending: true })
-        .limit(5);
+        .eq("workspace_id", workspace.id)
+        .eq("status", "scheduled")
+        .order("scheduled_at", { ascending: true })
+        .limit(50);
 
       if (error) throw error;
-      setScheduledPosts(data || []);
+      
+      // Transform data for backward compatibility
+      const transformed = (data || []).map((post) => ({
+        ...post,
+        scheduled_for: post.scheduled_at, // For backward compatibility
+        media_urls: Array.isArray(post.media_urls) 
+          ? post.media_urls 
+          : typeof post.media_urls === 'string' 
+            ? JSON.parse(post.media_urls) 
+            : [],
+        hashtags: typeof post.hashtags === 'string' 
+          ? post.hashtags.split(',').map(h => h.trim()) 
+          : [],
+        instagram_accounts: post.instagram_accounts ? {
+          ...post.instagram_accounts,
+          avatar_url: post.instagram_accounts.profile_picture_url
+        } : undefined
+      }));
+      
+      setScheduledPosts(transformed);
     } catch (error: any) {
       toast({
         title: "Error fetching scheduled posts",
@@ -67,36 +91,58 @@ export const useScheduledPosts = () => {
     hashtags?: string[];
     scheduled_for: string;
   }) => {
-    if (!user) return null;
+    if (!user || !workspace) return null;
 
     try {
+      // Convert hashtags array to string
+      const hashtagsString = post.hashtags?.join(', ') || null;
+      
       const { data, error } = await supabase
         .from("scheduled_posts")
         .insert({
-          ...post,
-          user_id: user.id,
-          status: "pending",
+          workspace_id: workspace.id,
+          instagram_account_id: post.account_id,
+          caption: post.caption || null,
+          media_type: post.media_type || "image",
+          media_urls: post.media_urls || [],
+          hashtags: hashtagsString,
+          scheduled_at: post.scheduled_for,
+          status: "scheduled",
         })
         .select(`
           *,
           instagram_accounts (
             username,
-            avatar_url
+            profile_picture_url
           )
         `)
         .single();
 
       if (error) throw error;
 
-      setScheduledPosts((prev) => [...prev, data].sort(
+      // Transform for backward compatibility
+      const transformed = {
+        ...data,
+        scheduled_for: data.scheduled_at,
+        media_urls: Array.isArray(data.media_urls) ? data.media_urls : [],
+        hashtags: typeof data.hashtags === 'string' 
+          ? data.hashtags.split(',').map((h: string) => h.trim()) 
+          : [],
+        instagram_accounts: data.instagram_accounts ? {
+          ...data.instagram_accounts,
+          avatar_url: data.instagram_accounts.profile_picture_url
+        } : undefined
+      };
+
+      setScheduledPosts((prev) => [...prev, transformed].sort(
         (a, b) => new Date(a.scheduled_for).getTime() - new Date(b.scheduled_for).getTime()
-      ).slice(0, 5));
+      ));
 
       toast({
         title: "Post scheduled!",
         description: "Your post has been scheduled successfully.",
       });
-      return data;
+      return transformed;
     } catch (error: any) {
       toast({
         title: "Error scheduling post",

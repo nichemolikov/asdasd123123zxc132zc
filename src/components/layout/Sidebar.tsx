@@ -8,7 +8,8 @@ import {
   Instagram,
   TrendingUp,
   Clock,
-  Sparkles
+  Sparkles,
+  Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,8 +22,9 @@ interface SidebarProps {
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "accounts", label: "Accounts", icon: Users },
-  { id: "schedule", label: "Schedule", icon: Calendar },
+  { id: "schedule", label: "Scheduler", icon: Calendar },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "alerts", label: "Alerts", icon: Bell },
   { id: "insights", label: "AI Insights", icon: Sparkles },
 ];
 
@@ -39,7 +41,7 @@ export const Sidebar = ({ activeItem, onNavigate }: SidebarProps) => {
           <Instagram className="w-5 h-5 text-sidebar-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-sidebar-foreground">InstaFlow</h1>
+          <h1 className="text-lg font-bold text-sidebar-foreground">InstaCommand</h1>
           <p className="text-xs text-sidebar-foreground/60">Management Suite</p>
         </div>
       </div>
