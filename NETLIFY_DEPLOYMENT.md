@@ -41,10 +41,10 @@ git push -u origin main
    - Connect to your Git provider (GitHub/GitLab/Bitbucket)
    - Select your repository
 
-3. **Configure Build Settings**
-   - **Build command**: `npm run build`
-   - **Publish directory**: `dist`
-   - Netlify should auto-detect these from `netlify.toml`
+               3. **Configure Build Settings**
+                  - **Build command**: `npm run build`
+                  - **Publish directory**: `dist`
+                  - Netlify should auto-detect these from `netlify.toml`
 
 4. **Set Environment Variables**
    - Go to **Site settings** → **Environment variables**
